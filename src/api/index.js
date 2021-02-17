@@ -26,12 +26,8 @@ instance.interceptors.request.use(config => {
 instance.interceptors.response.use(res => {
   const data = res.data;
   if (data.status === 403) {
-    Vue.prototype.$toast({
-      message: data.message,
-      duration: 1500
-    });
+
   } else if (data.status === 401) {
-    console.log('响应拦截器: 删除token，准备显示ModelBox组件');
     localStorage.removeItem('token');
   }
   return data;

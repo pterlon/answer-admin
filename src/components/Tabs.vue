@@ -108,6 +108,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        cursor: pointer;
         .activeText {
           color: #5754fd;
         }
