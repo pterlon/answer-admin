@@ -59,7 +59,7 @@
       <el-form-item class="public" label="各选项内容" prop="options">
         <el-input
           class="item-input"
-          :placeholder="`请输入${formatItem(num)}的内容`"
+          :placeholder="`请输入${formatItem(num)}的内容，有多个可能的值以&&分隔`"
           size="small"
           v-for="(num,i) in ruleForm.resCount"
           :key="num"
@@ -67,6 +67,9 @@
         >
           <template slot="prepend">{{formatItem(num)}}</template>
         </el-input>
+      </el-form-item>
+      <el-form-item class="public" label="分值" prop="score">
+        <el-input-number size="small" :precision="1" :step="0.5" :min="1" :max="3" v-model="ruleForm.score"/>
       </el-form-item>
       <el-form-item class="public" label="题目解析" prop="description">
         <el-input type="textarea" :rows="4" v-model="ruleForm.description" size="small"/>
@@ -83,10 +86,9 @@
 </template>
 
 <script>
-import {
-  Button, Checkbox, CheckboxButton, CheckboxGroup, Dialog,
-  Form, FormItem, Input, InputNumber, RadioButton, RadioGroup, Upload
-} from 'element-ui';
+  import {
+    Button, Dialog, Form, FormItem, Input, InputNumber, RadioButton, RadioGroup, Upload
+  } from 'element-ui';
   export default {
     name: "FillTimuTemplate",
     components: {
@@ -99,9 +101,6 @@ import {
       'ElDialog': Dialog,
       'ElInputNumber': InputNumber,
       'ElButton': Button,
-      'ElCheckboxGroup': CheckboxGroup,
-      'ElCheckboxButton': CheckboxButton,
-      'ElCheckbox': Checkbox,
     },
     data() {
       return {
@@ -112,6 +111,7 @@ import {
           options: new Array(1).fill(''),
           resCount: 1,
           description: '',
+          score: 1,
         },
         rules: {},
         showuploadimg: false,
@@ -146,7 +146,10 @@ import {
       submitForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            console.log('submit');
+            let data = this.formatTimuData(this.ruleForm);
+            console.log(data);
+            this.$store.commit('setTimu', data);
+            this.resetForm(formName);
           } else {
             console.log('error submit!!');
             return false;
@@ -155,6 +158,21 @@ import {
       },
       resetForm(formName) {
         this.$refs[formName].resetFields();
+      },
+      formatTimuData(formData) {
+        let data = {};
+        if (formData.typename === '文字') {
+          data.name = formData.name.trim();
+        } else {
+          data.img = formData.img;
+        }
+        data.res_json = formData.options.map(item => {
+          return item.split('&&');
+        });
+        data.res_count = formData.resCount;
+        data.description = formData.description.trim();
+        data.score = formData.score;
+        return data;
       },
     },
   }

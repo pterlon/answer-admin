@@ -55,11 +55,13 @@
 </script>
 
 <style lang="scss" scoped>
+  @import "../assets/css/init";
   .top {
     padding-bottom: 4px;
     border-bottom: 1px solid #e8e8e8;
     margin-bottom: 5px;
     font-size: 12px;
+    @include toEllipse(2);
     img {
       width: 60%;
     }

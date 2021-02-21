@@ -3,6 +3,10 @@
  * mail -  hangyangws@foxmail.com
  * weibo - http://weibo.com/512jj
  */
+.el-popover {
+  padding: 5px;
+  min-width: 50px !important;
+}
 html {
   /*标准字体大小设置 14 像素「rem 参照对象」*/
   font-size: 14px;

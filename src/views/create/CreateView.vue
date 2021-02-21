@@ -19,7 +19,9 @@
     <div class="create-operation">
       <create-timu/>
     </div>
-    <div class="craeted-timus"></div>
+    <div class="craeted-timus">
+      <created-list/>
+    </div>
     <el-dialog
       :visible.sync="islook"
       append-to-body
@@ -34,6 +36,7 @@
   import TimuCard from "@/components/TimuCard";
   import LookTimu from "@/components/LookTimu";
   import CreateTimu from "@/views/create/CreateTimu";
+  import CreatedList from "@/views/create/CreatedList";
   import { Dialog } from 'element-ui'
   import { getAllTimus } from '@/api/request'
   export default {
@@ -44,6 +47,7 @@
       'ElDialog': Dialog,
       LookTimu,
       CreateTimu,
+      CreatedList,
     },
     data() {
       return {
@@ -111,7 +115,9 @@
         this.islook = true;
         this.currTimu = timu;
       },
-      insertTimu(timu) {},
+      insertTimu(timu) {
+        this.$store.commit('setCreatedTimu', timu);
+      },
     },
   }
 </script>
@@ -160,6 +166,8 @@
       width: 300px;
       background-color: #fff;
       border-radius: 4px;
+      box-sizing: border-box;
+      padding: 10px;
     }
   }
 </style>

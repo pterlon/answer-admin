@@ -54,7 +54,7 @@
         </el-upload>
       </el-form-item>
       <el-form-item class="public" label="选项数量" prop="optionsCount">
-        <el-input-number size="small" :min="2" :max="10" v-model="ruleForm.optionsCount"></el-input-number>
+        <el-input-number size="small" :min="2" :max="10" v-model="ruleForm.optionsCount"/>
       </el-form-item>
       <el-form-item class="public" label="各选项内容" prop="options">
         <el-input
@@ -73,16 +73,19 @@
           <el-radio-button :label="formatItem(num-1)" v-for="num in ruleForm.optionsCount" :key="num"/>
         </el-radio-group>
       </el-form-item>
+      <el-form-item class="public" label="分值" prop="score">
+        <el-input-number size="small" :precision="1" :step="0.5" :min="0.5" :max="2" v-model="ruleForm.score"/>
+      </el-form-item>
       <el-form-item class="public" label="题目解析" prop="description">
         <el-input type="textarea" :rows="4" v-model="ruleForm.description" size="small"/>
       </el-form-item>
-      <el-form-item>
+      <el-form-item class="public">
         <el-button type="primary" size="small" @click="submitForm('ruleForm')">立即创建</el-button>
         <el-button size="small" @click="resetForm('ruleForm')">重置</el-button>
       </el-form-item>
     </el-form>
     <el-dialog :visible.sync="showuploadimg">
-      <img width="100%" :src="uploadImgUrl" alt="">
+      <img width="100%" :src="ruleForm.img" alt="">
     </el-dialog>
   </div>
 </template>
@@ -114,10 +117,10 @@
           options: new Array(4).fill(''),
           res: [''],
           description: '',
+          score: 1,
         },
         rules: {},
         showuploadimg: false,
-        uploadImgUrl: '',
       }
     },
     watch: {
@@ -133,7 +136,7 @@
     },
     methods: {
       handlePictureCardPreview(file) {
-        this.uploadImgUrl = file.url;
+        this.ruleForm.img = file.url;
         this.showuploadimg = true;
       },
       handleDownload(file) {
@@ -149,11 +152,31 @@
         this.$refs[formName].validate((valid) => {
           if (valid) {
             console.log('submit');
+            let timu = this.formatTimuData(this.ruleForm);
+            console.log(timu);
+            this.$store.commit('setTimu', timu);
+            this.resetForm(formName);
           } else {
             console.log('error submit!!');
             return false;
           }
         });
+      },
+      formatTimuData(formData) {
+        let data = {};
+        if (formData.typename === '文字') {
+          data.name = formData.name.trim();
+        } else {
+          data.img = formData.img;
+        }
+        data.options_count = formData.optionsCount;
+        data.options = formData.options.map(item => item.trim());
+        data.res = formData.res.map(item => {
+          return data.options[item.charCodeAt() - 65];
+        });
+        data.description = formData.description.trim();
+        data.score = formData.score;
+        return data;
       },
       resetForm(formName) {
         this.$refs[formName].resetFields();
