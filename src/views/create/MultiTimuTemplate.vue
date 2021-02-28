@@ -21,9 +21,10 @@
         <el-upload
             class="my-upload"
             action="#"
+            ref="upload"
+            :http-request="fetchUploadImg"
             list-type="picture-card"
-            :multiple="false"
-            :auto-upload="false">
+            :multiple="false">
           <i slot="default" class="el-icon-plus"></i>
           <div slot="file" slot-scope="{file}">
             <img
@@ -36,12 +37,6 @@
                   @click="handlePictureCardPreview(file)"
               >
                 <i class="el-icon-zoom-in"></i>
-              </span>
-              <span
-                  class="el-upload-list__item-delete"
-                  @click="handleDownload(file)"
-              >
-                <i class="el-icon-download"></i>
               </span>
               <span
                   class="el-upload-list__item-delete"
@@ -94,10 +89,11 @@
 </template>
 
 <script>
-  import {
-    Form, FormItem, Input, RadioGroup, RadioButton, Upload, Dialog,
-    InputNumber, Button, CheckboxGroup, CheckboxButton, Checkbox
-  } from 'element-ui';
+import {
+  Form, FormItem, Input, RadioGroup, RadioButton, Upload, Dialog,
+  InputNumber, Button, CheckboxGroup, CheckboxButton, Checkbox, Notification
+} from 'element-ui';
+import {uploadImg} from "@/api/request";
   export default {
     name: "MultiTimuTemplate",
     components: {
@@ -148,11 +144,20 @@
         this.uploadImgUrl = file.url;
         this.showuploadimg = true;
       },
-      handleDownload(file) {
-        console.log(file);
-      },
       handleRemove(file) {
-        console.log(file);
+        this.$refs.upload.handleRemove(file);
+      },
+      async fetchUploadImg({ file }) {
+        let form = new FormData();
+        form.append('file', file);
+        try {
+          let res = await uploadImg(form);
+          this.ruleForm.img = res.data.path;
+          Notification.success('图片上传成功');
+          return Promise.resolve();
+        } catch (e) {
+          return Promise.reject(e);
+        }
       },
       formatItem(num) {
         return String.fromCharCode(65 + num);

@@ -17,7 +17,7 @@
       </div>
     </div>
     <div class="create-operation">
-      <create-timu/>
+      <create-timu @finished="finished"/>
     </div>
     <div class="craeted-timus">
       <created-list/>
@@ -117,6 +117,18 @@
       },
       insertTimu(timu) {
         this.$store.commit('setCreatedTimu', timu);
+      },
+      finished() {
+        let obj = {
+          list: [],
+          start: 0,
+          limit: 10,
+          loading: false,
+          isfinish: false,
+        }
+        this.singles = { ...obj }
+        this.multis = { ...obj }
+        this.fills = { ...obj }
       },
     },
   }

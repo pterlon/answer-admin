@@ -20,32 +20,27 @@
       <el-form-item v-else class="public" label="题目图片" prop="img">
         <el-upload
             class="my-upload"
+            ref="upload"
             action="#"
             list-type="picture-card"
-            :multiple="false"
-            :auto-upload="false">
+            :http-request="fetchUploadImg"
+            :multiple="false">
           <i slot="default" class="el-icon-plus"></i>
           <div slot="file" slot-scope="{file}">
             <img
-                class="el-upload-list__item-thumbnail"
-                :src="file.url" alt=""
+              class="el-upload-list__item-thumbnail"
+              :src="file.url" alt=""
             >
             <span class="el-upload-list__item-actions">
               <span
-                  class="el-upload-list__item-preview"
-                  @click="handlePictureCardPreview(file)"
+                class="el-upload-list__item-preview"
+                @click="handlePictureCardPreview(file)"
               >
                 <i class="el-icon-zoom-in"></i>
               </span>
               <span
-                  class="el-upload-list__item-delete"
-                  @click="handleDownload(file)"
-              >
-                <i class="el-icon-download"></i>
-              </span>
-              <span
-                  class="el-upload-list__item-delete"
-                  @click="handleRemove(file)"
+                class="el-upload-list__item-delete"
+                @click="handleRemove(file)"
               >
                 <i class="el-icon-delete"></i>
               </span>
@@ -85,15 +80,16 @@
       </el-form-item>
     </el-form>
     <el-dialog :visible.sync="showuploadimg">
-      <img width="100%" :src="ruleForm.img" alt="">
+      <img width="100%" :src="pictureUrl" alt="">
     </el-dialog>
   </div>
 </template>
 
 <script>
   import {
-    Form, FormItem, Input, RadioGroup, RadioButton, Upload, Dialog, InputNumber, Button,
+    Form, FormItem, Input, RadioGroup, RadioButton, Upload, Dialog, InputNumber, Button, Notification,
   } from 'element-ui';
+  import { uploadImg } from '../../api/request'
   export default {
     name: "SingleTimuTemplate",
     components: {
@@ -119,6 +115,8 @@
           description: '',
           score: 1,
         },
+        file: {},
+        pictureUrl: '',
         rules: {},
         showuploadimg: false,
       }
@@ -136,14 +134,23 @@
     },
     methods: {
       handlePictureCardPreview(file) {
-        this.ruleForm.img = file.url;
+        this.pictureUrl = file.url;
         this.showuploadimg = true;
       },
-      handleDownload(file) {
-        console.log(file);
-      },
       handleRemove(file) {
-        console.log(file);
+        this.$refs.upload.handleRemove(file);
+      },
+      async fetchUploadImg({ file }) {
+        let form = new FormData();
+        form.append('file', file);
+        try {
+          let res = await uploadImg(form);
+          this.ruleForm.img = res.data.path;
+          Notification.success('图片上传成功');
+          return Promise.resolve();
+        } catch (e) {
+          return Promise.reject(e);
+        }
       },
       formatItem(num) {
         return String.fromCharCode(65 + num);
@@ -151,9 +158,7 @@
       submitForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            console.log('submit');
             let timu = this.formatTimuData(this.ruleForm);
-            console.log(timu);
             this.$store.commit('setTimu', timu);
             this.resetForm(formName);
           } else {

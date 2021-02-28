@@ -49,7 +49,7 @@
         if (this.loading || this.phone.length !== 11) return;
         this.loading = true;
         toLogin(this.phone, this.password).then(({data}) => {
-          this.$router.replace('create');
+          this.$router.replace('/create');
           this.$store.commit('init', data);
         }).finally(() => {
           this.loading = false;

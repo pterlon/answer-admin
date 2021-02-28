@@ -163,7 +163,9 @@
               // 1.创建题目 2.创建挑战赛 3.将题目与挑战赛关联
               await this.insertTimu();
               await this.createGame();
+              this.resetForm(formName);
               await this.collectGame();
+              this.$emit('finished');
             }
           } else {
             console.log('error submit!!');
@@ -193,22 +195,27 @@
         let rankid = this.ruleForm.selected;
         let timus = [...this.realyList, ...this.alreadyList];
         let realylen = this.realyList.length;
-        try {
-          for (let i = 0; i < timus.length; i++) {
-            let timu = timus[i];
+        let arr = timus.map((timu,i) => {
+          return new Promise((resolve, reject) => {
             let type = this.getTimuType(timu);
-            await collectGame(rankid, timu.id, type);
-            if (i < realylen) {
-              this.$store.commit('deleteTimu', timu);
-            } else {
-              this.$store.commit('deleteCreatedTimu', timu);
-            }
-          }
+            collectGame(rankid, timu.id, type).then(() => {
+              if (i < realylen) {
+                this.$store.commit('deleteTimu', timu);
+              } else {
+                this.$store.commit('deleteCreatedTimu', timu);
+              }
+              resolve()
+            }).catch(e => {
+              reject(e);
+            })
+          })
+        })
+        Promise.all(arr).then(() => {
           Notification.success('题目关联挑战赛成功');
-        } catch (e) {
+        }).catch(e => {
           console.log(e);
           Notification.error('部分题目关联挑战赛失败');
-        }
+        })
       },
       getTimuType(timu) {
         if (timu.res_json) {
@@ -232,8 +239,8 @@
           rewards: rewards.join('&&'),
         };
         try {
-          await insertGame(obj);
-          this.resetForm(formName);
+          let { data } = await insertGame(obj);
+          this.ruleForm.selected = data.insertId;
           Notification.success('挑战赛创建成功');
         } catch (e) {
           Notification.error('挑战赛创建失败');

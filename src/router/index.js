@@ -6,6 +6,7 @@ import store from '@/store/index'
 const Login = () => import('@/views/login/Login');
 const Create = () => import('@/views/create/CreateView');
 const Audit = () => import('@/views/audit/AuditView');
+const AuditGame = () => import('@/views/audit/AuditGame');
 
 Vue.use(VueRouter)
 
@@ -28,6 +29,13 @@ const routes = [
     path: '/audit',
     name: 'Audit',
     component: Audit,
+    children: [
+      {
+        path: 'game',
+        name: 'AuditGame',
+        component: AuditGame,
+      }
+    ]
   },
 ]
 
@@ -44,15 +52,20 @@ router.beforeEach((async (to, from, next) => {
       let res = await isLogined();
       if (res.status === 401) return next();
       store.commit('init', res.data);
-      next('/create');
+      return next('/create');
     } else {
       return next();
     }
   }
-  if (token && !store.state.userinfo) {
+  if (token) {
+    if (store.state.userinfo) {
+      return next();
+    }
     let res = await isLogined();
     if (res.status === 401) return;
     store.commit('init', res.data);
+  } else {
+    return next('/login');
   }
   return next();
 }))

@@ -92,8 +92,12 @@
       .name {
         text-align: justify;
       }
-      .timu-img img {
-        width: 100%;
+      .timu-img {
+        display: flex;
+        justify-content: center;
+        img {
+          width: 50%;
+        }
       }
     }
     .timu-options {

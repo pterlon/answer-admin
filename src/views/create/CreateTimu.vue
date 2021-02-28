@@ -14,7 +14,7 @@
       </div>
     </div>
     <div class="second-step" v-if="step === 2">
-      <create-game/>
+      <create-game @finished="finished"/>
     </div>
     <div class="steps-bottom">
       <el-button-group>
@@ -74,12 +74,16 @@
         this.step--;
       },
       nextStep() {
-        /*if (this.realyList.length < 10) {
-          return Notification.warning('创建的题目数量不能小于10条');
-        }*/
+        if (this.realyList.length < 5) {
+          return Notification.warning('创建的题目数量不能小于5条');
+        }
         if (this.step >= 2) return;
         this.step++;
       },
+      finished() {
+        this.step = 1;
+        this.$emit('finished')
+      }
     },
   }
 </script>

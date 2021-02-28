@@ -21,9 +21,10 @@
         <el-upload
             class="my-upload"
             action="#"
+            ref="upload"
+            :http-request="fetchUploadImg"
             list-type="picture-card"
-            :multiple="false"
-            :auto-upload="false">
+            :multiple="false">
           <i slot="default" class="el-icon-plus"></i>
           <div slot="file" slot-scope="{file}">
             <img
@@ -86,9 +87,10 @@
 </template>
 
 <script>
-  import {
-    Button, Dialog, Form, FormItem, Input, InputNumber, RadioButton, RadioGroup, Upload
-  } from 'element-ui';
+import {
+  Button, Dialog, Form, FormItem, Input, InputNumber, Notification, RadioButton, RadioGroup, Upload
+} from 'element-ui';
+import {uploadImg} from "@/api/request";
   export default {
     name: "FillTimuTemplate",
     components: {
@@ -134,11 +136,20 @@
         this.uploadImgUrl = file.url;
         this.showuploadimg = true;
       },
-      handleDownload(file) {
-        console.log(file);
-      },
       handleRemove(file) {
-        console.log(file);
+        this.$refs.upload.handleRemove(file);
+      },
+      async fetchUploadImg({ file }) {
+        let form = new FormData();
+        form.append('file', file);
+        try {
+          let res = await uploadImg(form);
+          this.ruleForm.img = res.data.path;
+          Notification.success('图片上传成功');
+          return Promise.resolve();
+        } catch (e) {
+          return Promise.reject(e);
+        }
       },
       formatItem(num) {
         return `第${num}项`;
