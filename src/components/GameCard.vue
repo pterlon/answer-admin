@@ -1,6 +1,16 @@
 <template>
   <el-card shadow="hover" :body-style="bodyStyle">
     <div class="top">
+      <p class="status">
+        <button :class="{
+          end: game.status === 5,
+          doing: game.status === 1,
+          before: game.status === 2,
+          submit: game.status === 4
+        }">
+          {{statusMap[game.status]}}
+        </button>
+      </p>
       <p class="name">{{game.rname}}</p>
       <p class="createtime">{{time}}</p>
     </div>
@@ -20,7 +30,14 @@
       'ElCard': Card,
     },
     data() {
-      return {}
+      return {
+        statusMap: {
+          1: '进行中',
+          2: '未开始',
+          4: '未审核',
+          5: '已审核'
+        }
+      }
     },
     props: {
       game: {
@@ -68,6 +85,28 @@
     font-size: 12px;
     display: flex;
     align-items: center;
+    .status {
+      margin-right: 5px;
+      button {
+        padding: 0 5px;
+        border-radius: 4px;
+        color: #fff;
+        &.end {
+          background-color: #e8e8e8;
+          color: #ccc;
+        }
+        &.before {
+          background-color: #3fe391;
+        }
+        &.doing {
+          background-color: transparent;
+          background-image: linear-gradient(247deg, #00adff, #0089ff 35%, #2a2aff);
+        }
+        &.submit {
+          background-color: #5754fd;
+        }
+      }
+    }
     .name {
       flex: 1;
       overflow: hidden;

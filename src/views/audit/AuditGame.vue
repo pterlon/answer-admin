@@ -56,6 +56,8 @@
       <div class="top-title">
         <p class="game-name">排名信息</p>
       </div>
+      <rank-list-charts :list="allData"/>
+      <winning-list :list="allData" :game="game" isall/>
     </div>
   </div>
 </template>
@@ -63,15 +65,18 @@
 <script>
   import { getGameById, getRankRewards } from '@/api/request';
   import WinningList from "@/views/audit/WinningList";
+  import RankListCharts from "@/components/RankListCharts";
   export default {
     name: "AuditGame",
     components: {
       WinningList,
+      RankListCharts,
     },
     data() {
       return {
         game: {},
         rankList: [],
+        allData: [],
       }
     },
     watch: {
@@ -107,8 +112,11 @@
         return `${year}-${month}-${date} ${this.fullZero(hours)}:${this.fullZero(minutes)}:${this.fullZero(seconds)}`;
       },
       asyncGetRankList() {
-        getRankRewards(this.$route.query.id).then(res => {
+        getRankRewards(this.$route.query.id, 0, 3).then(res => {
           this.rankList = res.data;
+        })
+        getRankRewards(this.$route.query.id).then(res => {
+          this.allData = res.data;
         })
       }
     },
@@ -201,7 +209,6 @@
       padding: 10px;
       background-color: #fff;
       border-radius: 4px;
-      margin-bottom: 20px;
       .top-title {
         margin-bottom: 10px;
         .game-name {

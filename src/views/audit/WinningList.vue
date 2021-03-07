@@ -3,14 +3,15 @@
       :data="listTableData"
       size="small"
       style="width: 100%">
-    <el-table-column fixed prop="index" label="排名" width="50">
+    <el-table-column :fixed="!isall" prop="index" label="排名" width="70">
       <template slot-scope="{ $index }">
         <div class="rank-index">
-          <img class="rank-icon" :src="formatRankIndex($index)" alt="">
+          <img class="rank-icon" :src="formatRankIndex($index)" alt="" v-if="!isall">
+          <span v-else>{{$index + 1}}</span>
         </div>
       </template>
     </el-table-column>
-    <el-table-column fixed prop="nickname" label="昵称" width="120"/>
+    <el-table-column :fixed="!isall" prop="nickname" label="昵称"/>
     <el-table-column prop="resCount" label="正确数量" width="150"/>
     <el-table-column prop="failCount" label="错误数量" width="150"/>
     <el-table-column prop="visibleCount" label="跳出页面次数" width="150"/>
@@ -24,7 +25,7 @@
         <p class="use-time">{{formatUseTime(row, column, $index)}}</p>
       </template>
     </el-table-column>
-    <el-table-column prop="reward" label="奖励" width="150">
+    <el-table-column prop="reward" label="奖励" width="150" v-if="!isall">
       <template slot-scope="{ row }">
         <p class="integral-icon">
           <span>{{row.reward}}</span>
@@ -33,6 +34,7 @@
       </template>
     </el-table-column>
     <el-table-column
+        v-if="!isall"
         fixed="right"
         label="操作"
         width="100">
@@ -64,6 +66,10 @@
         type: Object,
         default: () =>({}),
       },
+      isall: {
+        type: Boolean,
+        default: false,
+      }
     },
     data() {
       return {}
