@@ -51,7 +51,7 @@
       }
     },
     computed: {
-      ...mapGetters(['realyList']),
+      ...mapGetters(['realyList', 'alreadyList']),
     },
     methods: {
       createSingleTimu() {
@@ -74,7 +74,7 @@
         this.step--;
       },
       nextStep() {
-        if (this.realyList.length < 5) {
+        if (this.realyList.length + this.alreadyList.length < 5) {
           return Notification.warning('创建的题目数量不能小于5条');
         }
         if (this.step >= 2) return;
